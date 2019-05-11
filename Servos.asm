@@ -2,7 +2,7 @@
 ; a minimal program. I suggest you copy this to start every programming project.>
 ;-----------------------------------------------------------------------------------------------------------------------
 ;;
-;            Assignment #:    	Program 2
+;            Assignment #:    	Program 1
 ;            Authors : 			Bean, Anthony, E01362835
 ;					Khan, Ismet, E01
 ;					McGrath, Connor, E01
