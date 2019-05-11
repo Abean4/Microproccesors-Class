@@ -14,6 +14,8 @@
 ;					high pulse to a low pulse, this program will begin to pay attention. It'll skip
 ;					the start bit (which acts as the signal that the sender is about to send a code),
 ;					read the next 3 bits, then returns to idle mode until another bit code is sent.
+
+;				This is used in both project 2 and 3. Both projects send binary codes to be displayed here.
 ;																									
 ;            < Let's agree upon the following conventions:																									
 ;                           Labels (for goto statements and functions) - ALL_CAPS																									
