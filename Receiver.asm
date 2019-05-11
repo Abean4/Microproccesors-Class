@@ -3,7 +3,7 @@
 ; a minimal program. I suggest you copy this to start every programming project.>																									
 ;-----------------------------------------------------------------------------------------------------------------------																									
 ;																									
-;            Assignment #:    Assignment 4 (Receiver)																								
+;            Assignment #:    Assignment 2 (Receiver)																								
 ;            Authors : 		Bean, Anthony, E01362835
 ;				Khan, Ismet, E01303340
 ;				McGrath, Connor, E01449286
