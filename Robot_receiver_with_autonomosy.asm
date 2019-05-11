@@ -4,7 +4,7 @@
 ;				you copy this to start every programming project.>
 ;-----------------------------------------------------------------------------------
 ;
-;            Assignment #:	Assignment 6 (Robot Receiver but with some automation)
+;            Assignment #:	Assignment 5 (Robot Receiver but with some automation)
 ;            Authors : 			Bean, Anthony, E01362835
 ;								Khan, Ismet, E01303340
 ;								McGrath, Connor, E01449286
