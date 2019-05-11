@@ -10,10 +10,10 @@
 ;            Date:   	      3/25/19																							
 ;																									
 ;            Program Description: This program allows the use of a keypad to send sequences to a receiver.
-;									It checks for keypad input, and calls the necessary function to send
-;									the appropriate bits. After a sequence is sent, the program calls a 
-;									3 millisecond delay. If nothing is pressed during the looping, the
-;									program continues sending nothing.
+;					It checks for keypad input, and calls the necessary function to send
+;					the appropriate bits. After a sequence is sent, the program calls a 
+;					3 millisecond delay. If nothing is pressed during the looping, the
+;					program continues sending nothing.
 ;																									
 ;            < Let's agree upon the following conventions:																									
 ;                           Labels (for goto statements and functions) - ALL_CAPS																									
