@@ -1,41 +1,40 @@
-; uncomment following two lines if using 16f627 or 16f628. config uses internal oscillator
-	LIST	p=16F628a		;tell assembler what chip we are using
-	include "P16F628a.inc"		;include the defaults for the chip
-	__config 0x3D18			;sets the configuration settings (oscillator type etc.)
-
+;           < Every program submitted in this class must follow the formatted prescribed here. What follows is																									
+; a minimal program. I suggest you copy this to start every programming project.>																									
 ;-----------------------------------------------------------------------------------------------------------------------																									
 ;																									
-;            Assignment #:    Assignment 5 (Keypad)																								
+;            Assignment #:    Assignment 3 (Keypad Sender)																								
 ;            Authors : 		Bean, Anthony, E01362835
-;				Khan, Ismet, E01303340
-;				McGrath, Connor, E01449286
-;            Filename:	      keypad.asm																									
+;							Khan, Ismet, E01303340
+;							McGrath, Connor, E01449286
+;            Filename:	      kbsender.asm																									
 ;            Date:   	      3/25/19																							
 ;																									
-;            Program Description: This program constantly reads in from a keypad. When the receiver detects a button being pressed
-;					, this program will begin to pay attention. It'll skip
-;					the start bit (which acts as the signal that the sender is about to send a code),
-;					read the next 3 bits, then returns to idle mode until another bit code is sent.
+;            Program Description: This program allows the use of a keypad to send sequences to a receiver.
+;									It checks for keypad input, and calls the necessary function to send
+;									the appropriate bits. After a sequence is sent, the program calls a 
+;									3 millisecond delay. If nothing is pressed during the looping, the
+;									program continues sending nothing.
 ;																									
 ;            < Let's agree upon the following conventions:																									
 ;                           Labels (for goto statements and functions) - ALL_CAPS																									
 ;                           Variable Names - first letter is capitalized, all rest are lower case. For example:  Count, Pint, Inches																									
 ;                           Commands - all lower case. For example:   goto , decfsz ,																									
 ;                           Defined Constants - ALL_CAPS (examples below)>																									
-;------------------------------------------------------------------------------------------------------------------------------		
+;------------------------------------------------------------------------------------------------------------------------------																									
+;																									
+;																									
+;					
+	LIST	p=16F628		;tell assembler what chip we are using
+	include "P16F628.inc"		;include the defaults for the chip
+	__config 0x3D18			;sets the configuration settings (oscillator type etc.)
 
-
-; Make life easy. Send bits in 1 msec intervals!!
-
+; Filename : Sample.asm
 
 ; DECLARE VARIABLES!!!!!!
-; We are telling the assembler we want to start allocating symbolic variables starting
-;    at machine location 0x20. Please refer to technical documents to see if this is OK!!
-
 cblock 	0x20 			;start of general purpose registers
-		count1 			;  count1 is symbolic name for location 0x20
-		counta 			;  counta is symbolic name for location 0x21
-		countb 			;  countb is symbolic name for location 0x22
+		Count1 			;  count1 is symbolic name for location 0x20
+		Counta 			;  counta is symbolic name for location 0x21
+		Countb 			;  countb is symbolic name for location 0x22
 		NUMBER
 	endc
 
@@ -64,10 +63,8 @@ cblock 	0x20 			;start of general purpose registers
 ;start  main code here
 main_loop
 
-read_kbd
-
-	movlw 0x00
-
+READ_KBD
+;	movlw 0x00
 	; inelegant code, but it does work!
 	; code  1- turn left
 	;       2- go straight
@@ -75,59 +72,96 @@ read_kbd
 	;       5- go in reverse
 	;       anything else, transmit a zero and stop motors
 	
-	bsf PORTB, 4			;	lets scan the first column of keys		
-	btfsc PORTB, 0			;	has the 1 key been pressed? if yes then send 1
-	movlw 0x01			;
-	btfsc PORTB, 1			;	has the 4 key been pressed? if yes then
-	movlw 0x00			;
-	btfsc PORTB, 2			;	has the 7 key been pressed? if yes then
-	movlw 0x00			;	copy decimal number 07 into w. but if not then continue on.
-	bcf PORTB, 4			;	now we have finished scanning the first column of keys
+	bsf 	PORTB, 4			;	lets scan the first column of keys		
+	btfsc 	PORTB, 0			;	has the 1 key been pressed? if yes then send 1
+	call	PUSHED_1			;
+	btfsc	PORTB, 1			;	has the 4 key been pressed? if yes then
+	call	PUSHED_4			;
+	btfsc 	PORTB, 2			;	has the 7 key been pressed? if yes then
+	call	PUSHED_7	;	copy decimal number 07 into w. but if not then continue on.
+	bcf 	PORTB, 4			;	now we have finished scanning the first column of keys
 	
-	bsf PORTB, 5			;	lets scan the middle column of keys
-	btfsc PORTB, 0			;	has the 2 key been pressed? if yes then
-	movlw 0x02			;	copy decimal number 02 into w. but if not then continue on.
-	btfsc PORTB, 1			;	has the 5 key been pressed? if yes then
-	movlw 0x05			;	copy decimal number 05 into w. but if not then continue on.
-	btfsc PORTB, 2			;	has the 8 key been pressed? if yes then
-	movlw 0x00			;copy decimal number 00 into w. but if not then continue on.
-	bcf PORTB, 5			;	now we have finished scanning the middle column of keys
+	bsf 	PORTB, 5			;	lets scan the middle column of keys
+	btfsc 	PORTB, 0			;	has the 2 key been pressed? if yes then
+	call	PUSHED_2			;	copy decimal number 02 into w. but if not then continue on.
+	btfsc 	PORTB, 1			;	has the 5 key been pressed? if yes then
+	call	PUSHED_5			;	copy decimal number 05 into w. but if not then continue on.
+	btfsc 	PORTB, 2			;	has the 8 key been pressed? if yes then
+	call	PUSHED_7			;copy decimal number 00 into w. but if not then continue on.
+	bcf 	PORTB, 5			;	now we have finished scanning the middle column of keys
 	
-	bsf PORTB, 6			;	lets scan the last column of keys
-	btfsc PORTB, 0			;	has the 3 key been pressed? if yes then
-	movlw 0x03			;	copy decimal number 03 into w. but if not then continue on.
-	btfsc PORTB, 1			;	has the 6 key been pressed? if yes then
-	movlw 0x00			;	copy decimal number 06 into w. but if not then continue on.
-	btfsc PORTB, 2			;	has the 9 key been pressed? if yes then
-	movlw  0x00			;	copy decimal number 09 into w. but if not then continue on.
-	bcf PORTB, 6			;	no
+	bsf 	PORTB, 6			;	lets scan the last column of keys
+	btfsc 	PORTB, 0			;	has the 3 key been pressed? if yes then
+	call	PUSHED_3		;	copy decimal number 03 into w. but if not then continue on.
+	btfsc 	PORTB, 1			;	has the 6 key been pressed? if yes then
+	call	PUSHED_6		;	copy decimal number 06 into w. but if not then continue on.
+	btfsc 	PORTB, 2			;	has the 9 key been pressed? if yes then
+	call	PUSHED_7			;	copy decimal number 09 into w. but if not then continue on.
+	bcf 	PORTB, 6			;	no
+
+	call	WAIT
+	goto	READ_KBD
 
 
-;	lazy programmer! didn't even check other keys!!!
+;Our what-if the number is ever greater than 6 --> Our error alarm
+PUSHED_7
+	call	SEND_0_BIT		
+	call	SEND_1_BIT		
+	call	SEND_1_BIT
+	call	SEND_1_BIT
+	return
 
+PUSHED_1
+	call	SEND_0_BIT		
+	call	SEND_0_BIT		
+	call	SEND_0_BIT
+	call	SEND_1_BIT
+	return		
+		
+PUSHED_2
+	call	SEND_0_BIT		
+	call	SEND_0_BIT		
+	call	SEND_1_BIT
+	call	SEND_0_BIT
+	return		
+		
+PUSHED_3
+	call	SEND_0_BIT		
+	call	SEND_0_BIT		
+	call	SEND_1_BIT
+	call	SEND_1_BIT
+	return		
+		
+PUSHED_4
+	call	SEND_0_BIT		
+	call	SEND_1_BIT		
+	call	SEND_0_BIT
+	call	SEND_0_BIT
+	return		
+		
+PUSHED_5
+	call	SEND_0_BIT		
+	call	SEND_1_BIT		
+	call	SEND_0_BIT
+	call	SEND_1_BIT
+	return		
+		
+PUSHED_6
+	call	SEND_0_BIT		
+	call	SEND_1_BIT		
+	call	SEND_1_BIT
+	call	SEND_0_BIT
+	return		
+		
+WAIT
+	movlw	0x03
+	movwf	Counta
+	call	SEND_1_BIT
+	decfsz	Counta
+	goto	$-2
+	return
 
-	movwf 	NUMBER	
-	movf	NUMBER,1
-	btfsc	STATUS,Z	; was a number other than 0 entered ? If yes, skip next statement
-
-	goto read_kbd
-	
-;   Time to transmit. There is a start bit plus three more bits.
-;   You might want to read up on the rlf and rrf commands, since you need to
-;   shift bits to get to the three low order bits
-
-
-
-	; send all 4 bits in here
-
-
-	call	DELAY_1_MILLI	; let it resettle!!!!! Don't send stuff so fast!!
-	call	DELAY_1_MILLI
-	call	DELAY_1_MILLI
-	goto	read_kbd	
-	
-	
-	SEND_0_BIT	
+SEND_0_BIT	
 	movlw	0x25 		;Setting count2 to 250
 	movwf	Countb	
 	call	FLASH 		;Flash each cycle, 22 micro
@@ -144,7 +178,7 @@ SEND_1_BIT
 	return
 
 FLASH		;Should take 22 microsec to complete, and the CALL of it takes 2, bringing us to our total of 26		
-	bsf	PORTB, 4
+	bsf		PORTA, 0
 	nop	
 	nop	
 	nop	
@@ -160,7 +194,7 @@ FLASH		;Should take 22 microsec to complete, and the CALL of it takes 2, bringin
 	nop	
 	nop	
 	nop 			;High for 16 microseconds	
-	bcf	PORTB, 4
+	bcf		PORTA, 0
 	nop	
 	nop	
 	nop	
@@ -168,7 +202,7 @@ FLASH		;Should take 22 microsec to complete, and the CALL of it takes 2, bringin
 		
 		
 OFF		
-	bcf	PORTB, 4
+	bcf		PORTA, 0
 	movlw	0x05
 	movwf	Count1
 	nop	
@@ -177,22 +211,5 @@ OFF
 	decfsz	Count1
 	goto	$-2
 	return		
-	
-	DELAY_500_MICROS
-	movlw	0x7c
-	movwf	Count1
-	nop
-	decfsz	Count1
-	goto	$-2
-	return
-																									
-DELAY_1_MILLI
-	movlw	0xf9
-	movwf	Count1
-	nop
-	decfsz	Count1
-	goto	$-2
-	return
-
-	
+; don't forget the word 'end'	
 	end
